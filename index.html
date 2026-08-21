@@ -346,6 +346,23 @@
             </div>
           </div>
           <div class="pay-msg" id="pay-msg"></div>
+
+          <!-- Upload capture -->
+          <div id="upload-zone" style="display:none;margin-bottom:14px;">
+            <div style="font-size:12px;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">📸 Joindre la capture d'écran du paiement *</div>
+            <label for="capture-input" id="upload-label" style="display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:2px dashed rgba(255,255,255,0.25);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;">
+              <div style="font-size:32px">📎</div>
+              <div style="font-size:14px;font-weight:600;color:#fff">Cliquez pour joindre une image</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.45)">JPG, PNG, capture d'écran acceptés</div>
+            </label>
+            <input type="file" id="capture-input" accept="image/*" style="display:none" onchange="previewCapture(this)">
+            <div id="capture-preview" style="display:none;margin-top:10px;text-align:center;">
+              <img id="preview-img" style="max-width:100%;max-height:180px;border-radius:10px;border:2px solid rgba(46,204,113,0.5);" alt="Capture paiement">
+              <div style="font-size:12px;color:rgba(46,204,113,0.9);margin-top:6px;">✅ Capture jointe — vous pouvez confirmer</div>
+              <button type="button" onclick="supprimerCapture()" style="font-size:12px;color:rgba(255,100,100,0.8);background:none;border:none;cursor:pointer;margin-top:4px;">✕ Supprimer</button>
+            </div>
+          </div>
+
           <button class="btn-jpaye" id="btn-jpaye" onclick="etape3()" disabled>✅ J'ai payé — Confirmer</button>
           <button class="btn-retour" onclick="retour1()">← Retour</button>
         </div>
@@ -515,8 +532,36 @@
   }
 
   function activerJpaye(){
-    var btn=document.getElementById('btn-jpaye');
-    btn.disabled=false;btn.classList.add('actif');
+    // Afficher la zone upload après choix du moyen de paiement
+    document.getElementById('upload-zone').style.display = 'block';
+    // Le bouton reste désactivé jusqu'à ce qu'une capture soit jointe
+  }
+
+  function previewCapture(input){
+    if(input.files && input.files[0]){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        document.getElementById('preview-img').src = e.target.result;
+        document.getElementById('capture-preview').style.display = 'block';
+        document.getElementById('upload-label').style.display = 'none';
+        // Activer le bouton J'ai payé
+        var btn = document.getElementById('btn-jpaye');
+        btn.disabled = false;
+        btn.classList.add('actif');
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function supprimerCapture(){
+    document.getElementById('capture-input').value = '';
+    document.getElementById('preview-img').src = '';
+    document.getElementById('capture-preview').style.display = 'none';
+    document.getElementById('upload-label').style.display = 'flex';
+    // Désactiver le bouton J'ai payé
+    var btn = document.getElementById('btn-jpaye');
+    btn.disabled = true;
+    btn.classList.remove('actif');
   }
 
   function etape3(){
